@@ -10,3 +10,8 @@ Port 8080 is in use, trying another one...
 Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
   npx update-browserslist-db@latest
   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+1:29:37 AM [vite] hmr update /src/index.css, /src/contexts/AuthContext.tsx, /src/components/VotingSection.tsx, /src/components/admin/AdminResults.tsx, /src/components/admin/ElectionManager.tsx
+1:29:48 AM [vite] hmr update /src/index.css, /src/contexts/AuthContext.tsx, /src/components/VotingSection.tsx, /src/components/admin/AdminResults.tsx, /src/components/admin/ElectionManager.tsx
+1:38:45 AM [vite] hmr update /src/index.css, /src/pages/Index.tsx, /src/components/VotingSection.tsx, /src/components/admin/AdminResults.tsx
+1:38:49 AM [vite] hmr update /src/index.css, /src/pages/Index.tsx, /src/components/VotingSection.tsx, /src/components/admin/AdminResults.tsx
+1:38:57 AM [vite] hmr update /src/index.css, /src/pages/Index.tsx, /src/components/VotingSection.tsx, /src/components/admin/AdminResults.tsx

@@ -116,7 +116,9 @@ class ApiService {
   }
 
   async getAllElections(): Promise<any[]> {
-    return this.request('/elections');
+    const response = await this.request('/elections');
+    console.log('🗳️ Fetched Elections:', response);
+    return response;
   }
 
   async deleteElection(electionId: string): Promise<{ success: boolean }> {
