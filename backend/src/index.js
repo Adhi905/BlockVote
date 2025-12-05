@@ -505,9 +505,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Serve frontend files
+// Serve simple status for root path
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
+  res.json({ message: 'BlockVote Backend API is running' });
 });
 
 // Get all elections
