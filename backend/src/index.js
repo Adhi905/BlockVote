@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 6001;
 
 // MongoDB connection
-const MONGO_URI = 'mongodb://localhost:27017/';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/';
 const DB_NAME = 'blockvote';
 const JWT_SECRET = 'your-secret-key-change-in-production';
 
@@ -29,6 +29,12 @@ let signer;
 let contract;
 
 // Connect to MongoDB
+console.log('🔌 Attempting to connect to MongoDB...');
+console.log('📝 MONGO_URI Type:', process.env.MONGO_URI ? 'Environment Variable' : 'Localhost Fallback');
+// Mask the URI for logging safety
+const maskedUri = MONGO_URI.includes('@') ? MONGO_URI.replace(/:([^:@]+)@/, ':****@') : MONGO_URI;
+console.log('🔗 Connection String:', maskedUri);
+
 MongoClient.connect(MONGO_URI)
   .then(async client => {
     console.log('✅ Connected to MongoDB');
