@@ -92,4 +92,4 @@ Modern React application with TypeScript, Vite, and shadcn/ui components.
 ### Legacy Frontend (`/legacy-frontend`)
 Original HTML/CSS/JS frontend for basic voting interface.
 - Entry point: `index.html`
-- Dashboards: `admin-dashboard.html`, `voter-dashboard.html`
+- Dashboards: `admin-dashboard.html`, `voter-dashboard.html`# BlockVote
