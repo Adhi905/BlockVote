@@ -67,16 +67,16 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-4">
           {/* Page Title */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-black mb-4 uppercase tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 uppercase tracking-tight">
               Admin <span className="gradient-text text-glow">Dashboard</span>
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-base sm:text-lg">
               Manage elections, configure geofencing, and monitor live results.
             </p>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex justify-center gap-2 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
             {tabs.map((tab) => (
               <Button
                 key={tab.id}
@@ -93,7 +93,7 @@ const AdminDashboard = () => {
 
           {/* Tab Content */}
           <div className="max-w-6xl mx-auto">
-            {activeTab === "elections" && <ElectionManager />}
+            {activeTab === "elections" && <ElectionManager onConfigureGeofencing={() => setActiveTab("geofencing")} />}
             {activeTab === "geofencing" && <GeofencingManager />}
             {activeTab === "results" && <AdminResults />}
           </div>

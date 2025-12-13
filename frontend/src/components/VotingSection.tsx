@@ -101,28 +101,26 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
         throw new Error('Failed to validate election');
       }
 
-      console.log(`[VOTE] Current election:`, currentElection.name);
-      console.log(`[VOTE] Selected candidate index:`, selectedCandidate);
-      console.log(`[VOTE] Candidate name:`, selectedCandidateData?.name);
+
 
       // Step 2: Vote directly using blockchain ID
       // Elections are now created on blockchain immediately, so blockchainElectionId should always exist
       if (!currentElection.blockchainElectionId) {
         // Backward compatibility: If election doesn't have blockchain ID (old election)
         // Create it on blockchain first
-        console.log('[VOTE] Old election without blockchain ID - creating on blockchain');
+
         const blockchainElectionId = await web3Service.createElectionAndVote(
           validateResponse.candidateCount || currentElection.candidates.length,
           parseInt(selectedCandidate)
         );
 
         // Save the blockchain election ID to MongoDB
-        console.log(`[VOTE] Saving blockchain election ID ${blockchainElectionId} to MongoDB...`);
+
         await apiService.updateElectionBlockchainId(currentElection.id, blockchainElectionId);
       } else {
         // Normal path: Election already has blockchain ID from creation
         const blockchainElectionId = currentElection.blockchainElectionId;
-        console.log(`[VOTE] Using blockchain election ID: ${blockchainElectionId}`);
+
         await web3Service.vote(blockchainElectionId, parseInt(selectedCandidate));
       }
 
@@ -157,10 +155,10 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-black mb-6 uppercase tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 uppercase tracking-tight">
             Cast Your <span className="gradient-text text-glow">Vote</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg">
             Select your preferred candidate below. Your vote will be securely recorded on the blockchain.
           </p>
         </div>
@@ -170,7 +168,7 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
             <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="w-10 h-10 text-primary" />
             </div>
-            <h3 className="text-2xl font-black mb-3 uppercase">Connect Your Wallet</h3>
+            <h3 className="text-xl sm:text-2xl font-black mb-3 uppercase">Connect Your Wallet</h3>
             <p className="text-muted-foreground mb-8">
               To participate in the election, please connect your blockchain wallet first.
             </p>
@@ -184,7 +182,7 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
             <div className="w-20 h-20 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="w-10 h-10 text-accent" />
             </div>
-            <h3 className="text-2xl font-black mb-3 uppercase">Location Required</h3>
+            <h3 className="text-xl sm:text-2xl font-black mb-3 uppercase">Location Required</h3>
             <p className="text-muted-foreground mb-4">
               Please verify your location above to proceed with voting.
             </p>
@@ -194,7 +192,7 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
             <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-6">
               <Vote className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-2xl font-black mb-3 uppercase">No Active Elections</h3>
+            <h3 className="text-xl sm:text-2xl font-black mb-3 uppercase">No Active Elections</h3>
             <p className="text-muted-foreground">
               There are currently no elections available for voting. Please check back later.
             </p>
@@ -253,7 +251,7 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
                   size="xl"
                   disabled={!selectedCandidate || isVoting}
                   onClick={handleVote}
-                  className="min-w-[280px]"
+                  className="w-full sm:min-w-[280px] sm:w-auto"
                 >
                   {isVoting ? (
                     <>

@@ -116,8 +116,8 @@ class ApiService {
   }
 
   async getAllElections(): Promise<any[]> {
-    const response = await this.request('/elections');
-    console.log('🗳️ Fetched Elections:', response);
+    const response = await this.request<any[]>('/elections');
+
     return response;
   }
 

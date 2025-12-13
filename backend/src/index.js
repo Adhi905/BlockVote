@@ -15,11 +15,11 @@ const PORT = process.env.PORT || 6001;
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/';
 const DB_NAME = 'blockvote';
-const JWT_SECRET = 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Blockchain configuration
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia.publicnode.com';
-const ADMIN_PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // This is the default Hardhat private key
+const ADMIN_PRIVATE_KEY = process.env.ADMIN_PRIVATE_KEY || '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
 let db;
 let usersCollection;
@@ -30,10 +30,6 @@ let contract;
 
 // Connect to MongoDB
 console.log('🔌 Attempting to connect to MongoDB...');
-console.log('📝 MONGO_URI Type:', process.env.MONGO_URI ? 'Environment Variable' : 'Localhost Fallback');
-// Mask the URI for logging safety
-const maskedUri = MONGO_URI.includes('@') ? MONGO_URI.replace(/:([^:@]+)@/, ':****@') : MONGO_URI;
-console.log('🔗 Connection String:', maskedUri);
 
 MongoClient.connect(MONGO_URI)
   .then(async client => {

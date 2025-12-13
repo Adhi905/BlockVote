@@ -11,16 +11,16 @@ export const HeroSection = ({ onStartVoting }: HeroSectionProps) => {
       {/* Background effects */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-accent/10 via-transparent to-transparent" />
-      
+
       {/* Grid pattern */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`,
           backgroundSize: '60px 60px'
         }}
       />
-      
+
       {/* Floating elements */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[150px] animate-float animate-glow-rotate" />
       <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-accent/20 rounded-full blur-[120px] animate-float" style={{ animationDelay: "1.5s" }} />
@@ -32,12 +32,12 @@ export const HeroSection = ({ onStartVoting }: HeroSectionProps) => {
             <span className="text-sm font-bold text-primary uppercase tracking-wider">Powered by Blockchain</span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black mb-8 animate-fade-in leading-tight" style={{ animationDelay: "0.1s" }}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-8 animate-fade-in leading-tight" style={{ animationDelay: "0.1s" }}>
             <span className="text-foreground">THE FUTURE OF</span>
             <span className="block gradient-text text-glow">VOTING</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto animate-fade-in font-medium" style={{ animationDelay: "0.2s" }}>
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto animate-fade-in font-medium" style={{ animationDelay: "0.2s" }}>
             Cast your vote with complete transparency and security. Every vote is immutably recorded on the blockchain.
           </p>
 
@@ -56,22 +56,22 @@ export const HeroSection = ({ onStartVoting }: HeroSectionProps) => {
               <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mb-4 mx-auto">
                 <Lock className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-black text-lg mb-2 uppercase tracking-wide">End-to-End Encrypted</h3>
-              <p className="text-muted-foreground">Your vote is encrypted and only you hold the key</p>
+              <h3 className="font-black text-base sm:text-lg mb-2 uppercase tracking-wide">End-to-End Encrypted</h3>
+              <p className="text-muted-foreground text-sm">Your vote is encrypted and only you hold the key</p>
             </div>
             <div className="glass p-8 rounded-2xl border-primary/10 hover:border-primary/30 transition-all hover:scale-105">
               <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mb-4 mx-auto">
                 <Globe className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-black text-lg mb-2 uppercase tracking-wide">Fully Decentralized</h3>
-              <p className="text-muted-foreground">No single point of failure or control</p>
+              <h3 className="font-black text-base sm:text-lg mb-2 uppercase tracking-wide">Fully Decentralized</h3>
+              <p className="text-muted-foreground text-sm">No single point of failure or control</p>
             </div>
             <div className="glass p-8 rounded-2xl border-primary/10 hover:border-primary/30 transition-all hover:scale-105">
               <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mb-4 mx-auto">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-black text-lg mb-2 uppercase tracking-wide">Immutable Records</h3>
-              <p className="text-muted-foreground">Once recorded, votes cannot be altered</p>
+              <h3 className="font-black text-base sm:text-lg mb-2 uppercase tracking-wide">Immutable Records</h3>
+              <p className="text-muted-foreground text-sm">Once recorded, votes cannot be altered</p>
             </div>
           </div>
         </div>

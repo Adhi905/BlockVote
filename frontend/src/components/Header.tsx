@@ -28,11 +28,11 @@ export const Header = ({ isConnected, walletAddress, onConnect, onDisconnect }: 
           <img
             src="/favicon.png"
             alt="BlockVote Logo"
-            className="w-12 h-12 rounded-xl glow-primary object-contain bg-background/50"
+            className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl glow-primary object-contain bg-background/50"
           />
           <div>
-            <span className="text-2xl font-black gradient-text tracking-tight">BLOCKVOTE</span>
-            <p className="text-xs text-muted-foreground font-medium tracking-widest uppercase">Decentralized Voting</p>
+            <span className="text-lg sm:text-xl md:text-2xl font-black gradient-text tracking-tight">BLOCKVOTE</span>
+            <p className="hidden sm:block text-xs text-muted-foreground font-medium tracking-widest uppercase">Decentralized Voting</p>
           </div>
         </div>
 
@@ -47,7 +47,7 @@ export const Header = ({ isConnected, walletAddress, onConnect, onDisconnect }: 
           </a>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
           {/* User Info */}
           {user && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50">
@@ -59,18 +59,18 @@ export const Header = ({ isConnected, walletAddress, onConnect, onDisconnect }: 
           {/* Wallet Status */}
           {isConnected ? (
             <div className="flex items-center gap-3">
-              <div className="glass px-4 py-2 rounded-xl flex items-center gap-3 border-primary/20">
+              <div className="glass px-2 sm:px-3 md:px-4 py-2 rounded-xl flex items-center gap-2 sm:gap-3 border-primary/20">
                 <div className="w-3 h-3 rounded-full bg-primary animate-pulse glow-primary" />
-                <span className="text-sm font-mono text-foreground font-bold">
+                <span className="text-xs sm:text-sm font-mono text-foreground font-bold">
                   {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                 </span>
               </div>
-              <Button variant="ghost" size="sm" onClick={onDisconnect} className="text-muted-foreground">
+              <Button variant="ghost" size="sm" onClick={onDisconnect} className="text-muted-foreground hidden sm:inline-flex">
                 Disconnect
               </Button>
             </div>
           ) : (
-            <Button variant="wallet" onClick={onConnect}>
+            <Button variant="wallet" onClick={onConnect} size="sm" className="text-xs sm:text-sm">
               <Wallet className="w-4 h-4" />
               Connect Wallet
             </Button>

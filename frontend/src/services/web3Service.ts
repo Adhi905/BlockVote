@@ -38,7 +38,7 @@ class Web3Service {
       // This works without wallet connection
       // Use Vite's environment variable syntax
       const rpcUrl = 'https://eth-sepolia.g.alchemy.com/v2/xwlVwel0JeYZl1rGW_kgN';
-      console.log('Initializing contract with RPC:', rpcUrl);
+
 
       const provider = new ethers.JsonRpcProvider(rpcUrl);
 
@@ -48,7 +48,7 @@ class Web3Service {
         provider
       );
 
-      console.log('✅ Contract initialized in read-only mode');
+
     } catch (error) {
       console.error('Error initializing contract:', error);
     }
@@ -210,7 +210,7 @@ class Web3Service {
     }
 
     try {
-      console.log(`Creating election on blockchain with ${candidateCount} candidates...`);
+
 
       // Step 1: Create election on blockchain
       const contractWithSigner = this.contract.connect(this.signer) as any;
@@ -233,13 +233,13 @@ class Web3Service {
 
       const parsedLog = this.contract.interface.parseLog(event);
       const blockchainElectionId = Number(parsedLog.args.electionId);
-      console.log(`Election created on blockchain with ID: ${blockchainElectionId}`);
+
 
       // Step 2: Vote using the actual blockchain election ID
       const voteTx = await contractWithSigner.vote(blockchainElectionId, candidateIndex);
       await voteTx.wait();
 
-      console.log(`Vote submitted successfully on election ${blockchainElectionId}`);
+
 
       return blockchainElectionId;
     } catch (error: any) {

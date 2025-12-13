@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Calendar, Clock, Play, Square, Trash2, Users, X } from "lucide-react";
+import { Plus, Calendar, Clock, Play, Square, Trash2, Users, X, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { apiService } from "@/services/apiService";
 
@@ -22,7 +22,11 @@ interface Election {
   candidates: Candidate[];
 }
 
-export const ElectionManager = () => {
+interface ElectionManagerProps {
+  onConfigureGeofencing?: () => void;
+}
+
+export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps) => {
   const [elections, setElections] = useState<Election[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -176,6 +180,24 @@ export const ElectionManager = () => {
           Create Election
         </Button>
       </div>
+
+      {/* Geofencing Shortcut */}
+      {onConfigureGeofencing && (
+        <div className="flex items-center justify-between p-4 rounded-xl bg-accent/10 border border-accent/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-accent/20 rounded-lg">
+              <MapPin className="w-5 h-5 text-accent" />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm">Geofencing Configuration</h4>
+              <p className="text-xs text-muted-foreground">Restrict voting to specific locations.</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" onClick={onConfigureGeofencing} className="btn-hover-glow">
+            Configure Geofencing
+          </Button>
+        </div>
+      )}
 
       {/* Create Form */}
       {showForm && (

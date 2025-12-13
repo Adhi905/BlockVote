@@ -66,15 +66,15 @@ const Auth = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-primary overflow-hidden">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-primary overflow-hidden">
               <img src="/favicon.png" alt="BlockVote Logo" className="w-full h-full object-cover" />
             </div>
-            <span className="text-3xl font-black tracking-tight">BLOCKVOTE</span>
+            <span className="text-2xl sm:text-3xl font-black tracking-tight">BLOCKVOTE</span>
           </div>
           <p className="text-muted-foreground">Secure. Transparent. Decentralized.</p>
         </div>
 
-        <Card className="glass p-8 border-primary/20">
+        <Card className="glass p-4 sm:p-6 md:p-8 border-primary/20">
           {/* Tabs */}
           <div className="flex gap-2 mb-8">
             <Button
@@ -155,7 +155,7 @@ const Auth = () => {
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
               ) : (
                 <>
-                  {isLogin ? "Login" : "Create Account"}
+                  {isLogin ? "Login" : "Sign Up"}
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}

@@ -44,15 +44,13 @@ export const AdminResults = () => {
 
           if (electionIdToUse) {
             try {
-              console.log(`[Election: ${election.name}] Fetching votes for blockchain ID: ${electionIdToUse}`);
               voteCounts = await web3Service.getVotes(electionIdToUse);
-              console.log(`[Election: ${election.name}] Received vote counts:`, voteCounts);
             } catch (error) {
               console.error(`Error fetching votes for election ${election.name}:`, error);
               voteCounts = new Array(election.candidates.length).fill(0);
             }
           } else {
-            console.log(`[Election: ${election.name}] No blockchain ID yet, using zeros`);
+
             voteCounts = new Array(election.candidates.length).fill(0);
           }
 
