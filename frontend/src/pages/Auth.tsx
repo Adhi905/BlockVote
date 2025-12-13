@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
-import { Vote, Mail, Lock, User, ArrowRight, Shield } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Shield } from "lucide-react";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -66,8 +66,8 @@ const Auth = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-primary">
-              <Vote className="w-8 h-8 text-primary-foreground" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-primary overflow-hidden">
+              <img src="/favicon.png" alt="BlockVote Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-3xl font-black tracking-tight">BLOCKVOTE</span>
           </div>
