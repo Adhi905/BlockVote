@@ -35,7 +35,8 @@ contract Voting {
     }
 
     // create election with number of candidates
-    function createElection(uint256 candidateCount) external returns (uint256) {
+    // create election with number of candidates
+    function createElection(uint256 candidateCount) external onlyOwner returns (uint256) {
         require(candidateCount > 1, "need at least 2 candidates");
         uint256 eid = nextElectionId++;
         elections[eid] = Election({id: eid, candidateCount: candidateCount, ended: false, createdAt: block.timestamp});
