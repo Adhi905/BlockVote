@@ -60,7 +60,7 @@ export const Header = ({ isConnected, walletAddress, onConnect, onDisconnect }: 
           {isConnected ? (
             <div className="flex items-center gap-3">
               <div className="glass px-2 sm:px-3 md:px-4 py-2 rounded-xl flex items-center gap-2 sm:gap-3 border-primary/20">
-                <div className="w-3 h-3 rounded-full bg-primary animate-pulse glow-primary" />
+                <div className="w-3 h-3 rounded-full bg-primary glow-primary" />
                 <span className="text-xs sm:text-sm font-mono text-foreground font-bold">
                   {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                 </span>

@@ -110,7 +110,7 @@ export const AdminResults = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-black uppercase">Live Election Results</h2>
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-primary" />
           <span className="text-sm font-semibold">Auto-refresh: 3s</span>
         </div>
       </div>
