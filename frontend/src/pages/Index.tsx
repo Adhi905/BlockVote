@@ -5,6 +5,7 @@ import { VotingSection } from "@/components/VotingSection";
 import { SecuritySection } from "@/components/SecuritySection";
 import { Footer } from "@/components/Footer";
 import { LocationVerification } from "@/components/LocationVerification";
+import { useLocationVerification } from "@/hooks/useLocationVerification";
 import { toast } from "@/hooks/use-toast";
 import { web3Service } from "@/services/web3Service";
 import { apiService } from "@/services/apiService";
@@ -23,6 +24,12 @@ const Index = () => {
   const [geofenceLoading, setGeofenceLoading] = useState(true);
   const votingSectionRef = useRef<HTMLDivElement>(null);
 
+  // Initialize location verification hook
+  // We use the hook here so we can pass the verify function to VotingSection
+  const { verifyLocation } = useLocationVerification(
+    geofenceConfig || undefined
+  );
+
   useEffect(() => {
     const fetchGeofenceConfig = async () => {
       try {
@@ -35,7 +42,6 @@ const Index = () => {
       } catch (error) {
         console.error("Failed to fetch geofence config:", error);
         // On error, default to requiring location verification for security
-        // Do NOT auto-verify - this was the bug causing mobile bypass
         setGeofenceConfig({
           enabled: true,
           lat: 0,
@@ -115,6 +121,7 @@ const Index = () => {
             isConnected={isConnected}
             onConnectWallet={handleConnect}
             isLocationVerified={isLocationVerified}
+            onVerifyLocation={verifyLocation}
           />
         </div>
 

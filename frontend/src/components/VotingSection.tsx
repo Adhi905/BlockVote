@@ -20,9 +20,15 @@ interface VotingSectionProps {
   isConnected: boolean;
   onConnectWallet: () => void;
   isLocationVerified?: boolean;
+  onVerifyLocation?: () => Promise<boolean>;
 }
 
-export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified = false }: VotingSectionProps) => {
+export const VotingSection = ({
+  isConnected,
+  onConnectWallet,
+  isLocationVerified = false,
+  onVerifyLocation
+}: VotingSectionProps) => {
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -94,6 +100,17 @@ export const VotingSection = ({ isConnected, onConnectWallet, isLocationVerified
     setIsVoting(true);
 
     try {
+      // Step 0: Re-verify location if callback provided
+      // This enforces location check on EVERY vote attempt
+      if (onVerifyLocation) {
+        const isVerified = await onVerifyLocation();
+        if (!isVerified) {
+          // Toast is handled inside the verify function
+          setIsVoting(false);
+          return;
+        }
+      }
+
       // Step 1: Validate election with backend
       const validateResponse = await apiService.vote(currentElection.id, parseInt(selectedCandidate));
 
