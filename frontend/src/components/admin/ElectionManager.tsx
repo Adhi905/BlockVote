@@ -22,11 +22,7 @@ interface Election {
   candidates: Candidate[];
 }
 
-interface ElectionManagerProps {
-  onConfigureGeofencing?: () => void;
-}
-
-export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps) => {
+export const ElectionManager = () => {
   const [elections, setElections] = useState<Election[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);

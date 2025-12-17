@@ -3,13 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { Vote, LogOut, Plus, MapPin, Clock, BarChart3, Settings, Users } from "lucide-react";
+import { Vote, LogOut, Plus, Clock, BarChart3, Settings, Users } from "lucide-react";
 import { ElectionManager } from "@/components/admin/ElectionManager";
-import { GeofencingManager } from "@/components/admin/GeofencingManager";
 import { AdminResults } from "@/components/admin/AdminResults";
 import { toast } from "@/hooks/use-toast";
 
-type AdminTab = "elections" | "geofencing" | "results";
+type AdminTab = "elections" | "results";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -24,7 +23,6 @@ const AdminDashboard = () => {
 
   const tabs = [
     { id: "elections" as AdminTab, label: "Elections", icon: Plus },
-    { id: "geofencing" as AdminTab, label: "Geofencing", icon: MapPin },
     { id: "results" as AdminTab, label: "Live Results", icon: BarChart3 },
   ];
 
@@ -71,7 +69,7 @@ const AdminDashboard = () => {
               Admin <span className="gradient-text text-glow">Dashboard</span>
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg">
-              Manage elections, configure geofencing, and monitor live results.
+              Manage elections and monitor live results.
             </p>
           </div>
 
@@ -93,8 +91,7 @@ const AdminDashboard = () => {
 
           {/* Tab Content */}
           <div className="max-w-6xl mx-auto">
-            {activeTab === "elections" && <ElectionManager onConfigureGeofencing={() => setActiveTab("geofencing")} />}
-            {activeTab === "geofencing" && <GeofencingManager />}
+            {activeTab === "elections" && <ElectionManager />}
             {activeTab === "results" && <AdminResults />}
           </div>
         </div>
