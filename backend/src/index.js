@@ -502,6 +502,79 @@ app.post('/election/vote', verifyToken, async (req, res) => {
   }
 });
 
+// Geofencing configuration endpoints
+// GET - Public endpoint for all users to fetch geofence config
+app.get('/geofence', async (req, res) => {
+  try {
+    const configCollection = db.collection('config');
+    const config = await configCollection.findOne({ type: 'geofence' });
+
+    if (!config) {
+      // Return default config if none exists
+      return res.json({
+        enabled: false,
+        lat: 0,
+        lng: 0,
+        radius: 50,
+        name: 'Default Voting Zone'
+      });
+    }
+
+    res.json({
+      enabled: config.enabled,
+      lat: config.lat,
+      lng: config.lng,
+      radius: config.radius,
+      name: config.name
+    });
+  } catch (error) {
+    console.error('Get geofence config error:', error);
+    res.status(500).json({ error: 'Failed to get geofence config' });
+  }
+});
+
+// POST - Admin only endpoint to save geofence config
+app.post('/geofence', verifyToken, async (req, res) => {
+  try {
+    // Verify user is admin
+    const user = await usersCollection.findOne({ _id: new ObjectId(req.user.userId) });
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { enabled, lat, lng, radius, name } = req.body;
+
+    const configCollection = db.collection('config');
+
+    await configCollection.updateOne(
+      { type: 'geofence' },
+      {
+        $set: {
+          type: 'geofence',
+          enabled: enabled !== undefined ? enabled : false,
+          lat: lat || 0,
+          lng: lng || 0,
+          radius: radius || 50,
+          name: name || 'Voting Zone',
+          updatedAt: new Date(),
+          updatedBy: req.user.userId
+        }
+      },
+      { upsert: true }
+    );
+
+    console.log(`✅ Geofence config updated by admin ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Geofence configuration saved'
+    });
+  } catch (error) {
+    console.error('Save geofence config error:', error);
+    res.status(500).json({ error: 'Failed to save geofence config' });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });

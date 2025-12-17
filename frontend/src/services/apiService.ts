@@ -148,6 +148,30 @@ class ApiService {
     });
   }
 
+  // Geofencing
+  async getGeofenceConfig(): Promise<{
+    enabled: boolean;
+    lat: number;
+    lng: number;
+    radius: number;
+    name: string;
+  }> {
+    return this.request('/geofence');
+  }
+
+  async saveGeofenceConfig(config: {
+    enabled: boolean;
+    lat: number;
+    lng: number;
+    radius: number;
+    name: string;
+  }): Promise<{ success: boolean }> {
+    return this.request('/geofence', {
+      method: 'POST',
+      body: JSON.stringify(config),
+    });
+  }
+
   // Health Check
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     return this.request('/health');

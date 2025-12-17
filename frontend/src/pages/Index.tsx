@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { LocationVerification } from "@/components/LocationVerification";
 import { toast } from "@/hooks/use-toast";
 import { web3Service } from "@/services/web3Service";
+import { apiService } from "@/services/apiService";
 
 const Index = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -19,34 +20,37 @@ const Index = () => {
     name: string;
     enabled: boolean;
   } | null>(null);
+  const [geofenceLoading, setGeofenceLoading] = useState(true);
   const votingSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const storedCallback = () => {
-      const stored = localStorage.getItem("blockvote_geofence");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setGeofenceConfig(parsed);
-          // If geofencing is explicitly disabled in config, we consider location verified
-          if (parsed.enabled === false) {
-            setIsLocationVerified(true);
-          }
-        } catch (e) {
-          console.error("Failed to parse geofence config", e);
+    const fetchGeofenceConfig = async () => {
+      try {
+        const config = await apiService.getGeofenceConfig();
+        setGeofenceConfig(config);
+        // If geofencing is explicitly disabled by admin, auto-verify location
+        if (config.enabled === false) {
+          setIsLocationVerified(true);
         }
-      } else {
-        // If no config exists, we default to verified (or you could strictly require it)
-        // For now, let's assume no config means no restriction
-        setIsLocationVerified(true);
+      } catch (error) {
+        console.error("Failed to fetch geofence config:", error);
+        // On error, default to requiring location verification for security
+        // Do NOT auto-verify - this was the bug causing mobile bypass
+        setGeofenceConfig({
+          enabled: true,
+          lat: 0,
+          lng: 0,
+          radius: 50,
+          name: "Voting Zone"
+        });
+      } finally {
+        setGeofenceLoading(false);
       }
     };
 
-    storedCallback();
-    // Optional: listen for storage events if you want real-time updates across tabs
-    window.addEventListener('storage', storedCallback);
-    return () => window.removeEventListener('storage', storedCallback);
+    fetchGeofenceConfig();
   }, []);
+
 
   const handleConnect = async () => {
     try {

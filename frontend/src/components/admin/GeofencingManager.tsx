@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MapPin, Save, Globe, Crosshair } from "lucide-react";
+import { MapPin, Save, Globe, Crosshair, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { apiService } from "@/services/apiService";
 
 interface GeofenceConfig {
   lat: number;
@@ -23,22 +24,48 @@ export const GeofencingManager = () => {
     enabled: false,
   });
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("blockvote_geofence");
-    if (stored) {
-      setConfig(JSON.parse(stored));
-    }
+    const loadConfig = async () => {
+      try {
+        const savedConfig = await apiService.getGeofenceConfig();
+        setConfig(savedConfig);
+      } catch (error) {
+        console.error("Failed to load geofence config:", error);
+        toast({
+          title: "Warning",
+          description: "Could not load saved config. Using defaults.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadConfig();
   }, []);
 
-  const handleSave = () => {
-    localStorage.setItem("blockvote_geofence", JSON.stringify(config));
-    toast({ title: "Geofencing Saved", description: "The geofencing configuration has been updated." });
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await apiService.saveGeofenceConfig(config);
+      toast({ title: "Geofencing Saved", description: "Configuration saved to server. All users will now use these settings." });
+    } catch (error) {
+      console.error("Failed to save geofence config:", error);
+      toast({
+        title: "Save Failed",
+        description: "Could not save to server. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getCurrentLocation = () => {
     setIsGettingLocation(true);
-    
+
     if (!navigator.geolocation) {
       toast({ title: "Error", description: "Geolocation not supported", variant: "destructive" });
       setIsGettingLocation(false);
@@ -197,9 +224,18 @@ export const GeofencingManager = () => {
           </Card>
 
           {/* Save Button */}
-          <Button variant="hero" size="lg" onClick={handleSave} className="w-full">
-            <Save className="w-5 h-5" />
-            Save Configuration
+          <Button variant="hero" size="lg" onClick={handleSave} disabled={isSaving} className="w-full">
+            {isSaving ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                Save Configuration
+              </>
+            )}
           </Button>
         </div>
       </Card>
