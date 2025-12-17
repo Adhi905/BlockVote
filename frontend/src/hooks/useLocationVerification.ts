@@ -8,7 +8,7 @@ interface AllowedArea {
     name: string;
 }
 
-const DEFAULT_ALLOWED_AREA = {
+const DEFAULT_ALLOWED_AREA: AllowedArea = {
     lat: 0,
     lng: 0,
     radius: 50000,
@@ -24,8 +24,7 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
         const R = 6371; // Earth's radius in km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLng = (lng2 - lng1) * Math.PI / 180;
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLng / 2) * Math.sin(dLng / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -35,112 +34,61 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
     const verifyLocation = (overrideAllowedArea?: AllowedArea): Promise<boolean> => {
         return new Promise((resolve) => {
             const targetArea = overrideAllowedArea || allowedArea;
-
+            if (!navigator.geolocation) {
+                const err = "Geolocation is not supported by your browser";
+                setLocationError(err);
+                toast({ title: "Location Error", description: err, variant: "destructive" });
+                resolve(false);
+                return;
+            }
             setIsVerifying(true);
             setLocationError(null);
-
-            // Check for Secure Context (HTTPS)
-            if (!window.isSecureContext) {
-                const error = "Geolocation requires secure connection (HTTPS). Please access the site via HTTPS.";
-                setLocationError(error);
-                setIsVerifying(false);
-                toast({
-                    title: "Secure Connection Required",
-                    description: "Please access this site using HTTPS to enable location verification.",
-                    variant: "destructive",
-                });
-                resolve(false);
-                return;
-            }
-
-            if (!navigator.geolocation) {
-                const error = "Geolocation is not supported by your browser";
-                setLocationError(error);
-                setIsVerifying(false);
-                toast({
-                    title: "Location Error",
-                    description: error,
-                    variant: "destructive",
-                });
-                resolve(false);
-                return;
-            }
-
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-            const attemptGeolocation = (highAccuracy: boolean) => {
+            const attempt = (highAcc: boolean) => {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
+                    (pos) => {
+                        const { latitude, longitude } = pos.coords;
                         setUserLocation({ lat: latitude, lng: longitude });
-
-                        const distance = calculateDistance(
-                            latitude,
-                            longitude,
-                            targetArea.lat,
-                            targetArea.lng
-                        );
-
-                        const isWithinArea = distance <= targetArea.radius;
-
+                        const distance = calculateDistance(latitude, longitude, targetArea.lat, targetArea.lng);
+                        const within = distance <= targetArea.radius;
                         setIsVerifying(false);
-
-                        if (isWithinArea) {
-                            // Only toast on success if checks are being run manually, 
-                            // but we return the value regardless
-                        } else {
+                        if (!within) {
                             toast({
                                 title: "Location Not Authorized",
-                                description: `You are ${distance.toFixed(1)}km from the voting area (max: ${targetArea.radius}km). 
-                [Target: ${targetArea.lat.toFixed(4)}, ${targetArea.lng.toFixed(4)}] 
-                [Yours: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}]`,
+                                description: `You are ${distance.toFixed(1)}km from the voting area (max: ${targetArea.radius}km).`,
                                 variant: "destructive",
                             });
                         }
-
-                        resolve(isWithinArea);
+                        resolve(within);
                     },
                     (error) => {
-                        if (highAccuracy && error.code !== error.PERMISSION_DENIED) {
-                            console.log("High accuracy failed, retrying with standard accuracy...");
-                            attemptGeolocation(false);
+                        if (highAcc && error.code !== error.PERMISSION_DENIED) {
+                            attempt(false);
                             return;
                         }
-
-                        setIsVerifying(false);
-                        let errorMessage = "Unable to retrieve your location";
-
+                        let msg = "Unable to retrieve your location";
                         switch (error.code) {
                             case error.PERMISSION_DENIED:
-                                errorMessage = isIOS
-                                    ? "Location permission denied. Please go to Settings → Safari → Location Services to enable."
-                                    : "Location permission denied. Please enable location access in your browser settings.";
+                                msg = isIOS
+                                    ? "Location permission denied. Please enable in Settings → Safari → Location Services."
+                                    : "Location permission denied. Please enable in browser settings.";
                                 break;
                             case error.POSITION_UNAVAILABLE:
-                                errorMessage = "Location information unavailable. Please ensure GPS is enabled.";
+                                msg = "Location information unavailable. Ensure GPS is enabled.";
                                 break;
                             case error.TIMEOUT:
-                                errorMessage = "Location request timed out. Please check your connection.";
+                                msg = "Location request timed out. Check your connection.";
                                 break;
                         }
-
-                        setLocationError(errorMessage);
-                        toast({
-                            title: "Location Error",
-                            description: errorMessage,
-                            variant: "destructive",
-                        });
+                        setLocationError(msg);
+                        toast({ title: "Location Error", description: msg, variant: "destructive" });
+                        setIsVerifying(false);
                         resolve(false);
                     },
-                    {
-                        enableHighAccuracy: highAccuracy,
-                        timeout: 30000,
-                        maximumAge: 0, // Force fresh location check every time
-                    }
+                    { enableHighAccuracy: highAcc, timeout: 30000, maximumAge: 0 }
                 );
             };
-
-            attemptGeolocation(true);
+            attempt(true);
         });
     };
 
@@ -149,6 +97,6 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
         isVerifying,
         locationError,
         userLocation,
-        setLocationError
+        setLocationError,
     };
 };
