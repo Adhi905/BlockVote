@@ -328,7 +328,8 @@ app.get('/election/info/:id', async (req, res) => {
       candidateNames: election.candidateNames,
       createdAt: election.createdAt,
       durationSeconds: election.durationSeconds,
-      ended: election.ended
+      ended: election.ended,
+      geofence: election.geofence
     });
   } catch (error) {
     console.error('Get election info error:', error);
@@ -629,7 +630,8 @@ app.get('/elections', async (req, res) => {
       candidateNames: election.candidateNames,
       electionNumber: election.electionNumber,
       blockchainElectionId: election.blockchainElectionId,
-      blockchainCreated: election.blockchainCreated || false
+      blockchainCreated: election.blockchainCreated || false,
+      geofence: election.geofence // Include geofence config so frontend can enforce it
     }));
 
     res.json(formattedElections);
