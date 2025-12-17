@@ -248,7 +248,14 @@ app.post('/election/create', verifyToken, async (req, res) => {
       creatorEmail: req.user.email,
       createdAtDate: new Date(),
       blockchainCreated: false,
-      blockchainElectionId: null
+      blockchainElectionId: null,
+      geofence: req.body.geofence || {
+        enabled: false,
+        lat: 0,
+        lng: 0,
+        radius: 50,
+        name: 'Voting Zone'
+      }
     };
 
     // PERMANENT FIX: Create election on blockchain immediately

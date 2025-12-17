@@ -19,8 +19,8 @@ interface Candidate {
 interface VotingSectionProps {
   isConnected: boolean;
   onConnectWallet: () => void;
-  isLocationVerified?: boolean;
-  onVerifyLocation?: () => Promise<boolean>;
+  isLocationVerified?: boolean; // Deprecated but keeping for compatibility
+  onVerifyLocation?: (overrideArea?: any) => Promise<boolean>;
 }
 
 export const VotingSection = ({
@@ -100,14 +100,26 @@ export const VotingSection = ({
     setIsVoting(true);
 
     try {
-      // Step 0: Re-verify location if callback provided
-      // This enforces location check on EVERY vote attempt
+      // Step 0: Check Geofence
       if (onVerifyLocation) {
-        const isVerified = await onVerifyLocation();
-        if (!isVerified) {
-          // Toast is handled inside the verify function
-          setIsVoting(false);
-          return;
+        // Check if this specific election has geofencing enabled
+        if (currentElection.geofence && currentElection.geofence.enabled) {
+          const isVerified = await onVerifyLocation(currentElection.geofence);
+          if (!isVerified) {
+            setIsVoting(false);
+            return;
+          }
+        } else {
+          // If no specific geofence, we might fallback to global or skip
+          // For now, let's assume if it's not enabled on election, it's open
+          // UNLESS the prop requires it. But the prop is just a function.
+          // Let's pass undefined to use default if no election geofence, 
+          // OR skip if we want to allow voting.
+          // Given the requirements "verified by radius", let's assume explicit config.
+          // If election has NO geofence config (old elections), maybe skip check?
+          // Safest: Check if geofence exists.
+
+          console.log("No geofence enabled for this election, skipping check.");
         }
       }
 

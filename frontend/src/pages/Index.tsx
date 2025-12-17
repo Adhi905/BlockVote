@@ -6,6 +6,7 @@ import { SecuritySection } from "@/components/SecuritySection";
 import { Footer } from "@/components/Footer";
 import { LocationVerification } from "@/components/LocationVerification";
 import { useLocationVerification } from "@/hooks/useLocationVerification";
+import { ethers } from "ethers";
 import { toast } from "@/hooks/use-toast";
 import { web3Service } from "@/services/web3Service";
 import { apiService } from "@/services/apiService";
@@ -13,67 +14,48 @@ import { apiService } from "@/services/apiService";
 const Index = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
-  const [isLocationVerified, setIsLocationVerified] = useState(false);
-  const [geofenceConfig, setGeofenceConfig] = useState<{
-    lat: number;
-    lng: number;
-    radius: number;
-    name: string;
-    enabled: boolean;
-  } | null>(null);
-  const [geofenceLoading, setGeofenceLoading] = useState(true);
   const votingSectionRef = useRef<HTMLDivElement>(null);
 
-  // Initialize location verification hook
-  // We use the hook here so we can pass the verify function to VotingSection
-  const { verifyLocation } = useLocationVerification(
-    geofenceConfig || undefined
-  );
+  // Geofence config logic removed - moving to per-election check
+  const { verifyLocation } = useLocationVerification();
 
   useEffect(() => {
-    const fetchGeofenceConfig = async () => {
-      try {
-        const config = await apiService.getGeofenceConfig();
-        setGeofenceConfig(config);
-        // If geofencing is explicitly disabled by admin, auto-verify location
-        if (config.enabled === false) {
-          setIsLocationVerified(true);
-        }
-      } catch (error) {
-        console.error("Failed to fetch geofence config:", error);
-        toast({
-          title: "Configuration Error",
-          description: "Failed to load geofencing settings. Using default restrictions.",
-          variant: "destructive"
-        });
-        // On error, default to requiring location verification for security
-        setGeofenceConfig({
-          enabled: true,
-          lat: 0,
-          lng: 0,
-          radius: 50,
-          name: "Voting Zone"
-        });
-      } finally {
-        setGeofenceLoading(false);
-      }
-    };
-
-    fetchGeofenceConfig();
+    checkWalletConnection();
   }, []);
 
+  const checkWalletConnection = async () => {
+    // Check if window.ethereum exists and has accounts
+    if (window.ethereum) {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        const connected = accounts.length > 0;
+        setIsConnected(connected);
+        if (connected) {
+          setWalletAddress(accounts[0].address);
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error);
+        setIsConnected(false);
+      }
+    }
+  };
 
   const handleConnect = async () => {
     try {
-      const { address } = await web3Service.connectWallet();
-      setWalletAddress(address);
-      setIsConnected(true);
-      toast({
-        title: "Wallet Connected",
-        description: "You can now participate in the election.",
-      });
+      const result = await web3Service.connectWallet();
+      // web3Service.connectWallet returns { address, network }
+      const address = result.address;
+
+      setIsConnected(!!address);
+      if (address) {
+        setWalletAddress(address);
+        toast({
+          title: "Wallet Connected",
+          description: `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`
+        });
+      }
     } catch (error: any) {
-      console.error('Wallet connection error:', error);
       toast({
         title: "Connection Failed",
         description: error.message || "Failed to connect wallet",
@@ -107,30 +89,15 @@ const Index = () => {
       <main>
         <HeroSection onStartVoting={scrollToVoting} />
 
-        <div ref={votingSectionRef}>
-          {/* Location Verification - shown before voting */}
-          {isConnected && !isLocationVerified && (
-            <section className="py-16">
-              <div className="container mx-auto px-4">
-                <LocationVerification
-                  isVerified={isLocationVerified}
-                  onVerified={setIsLocationVerified}
-                  allowedArea={geofenceConfig || undefined}
-                />
-              </div>
-            </section>
-          )}
-
-          {/* Voting Section - only shown after location is verified */}
+        <div ref={votingSectionRef} className="py-16 container mx-auto px-4">
           <VotingSection
             isConnected={isConnected}
             onConnectWallet={handleConnect}
-            isLocationVerified={isLocationVerified}
+            isLocationVerified={true} // Always verified globally, specific check is inside VotingSection
             onVerifyLocation={verifyLocation}
           />
         </div>
 
-        {/* Results Section removed for voters */}
         <SecuritySection />
       </main>
 

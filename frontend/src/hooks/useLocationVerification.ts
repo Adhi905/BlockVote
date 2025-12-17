@@ -32,8 +32,10 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
         return R * c;
     };
 
-    const verifyLocation = (): Promise<boolean> => {
+    const verifyLocation = (overrideAllowedArea?: AllowedArea): Promise<boolean> => {
         return new Promise((resolve) => {
+            const targetArea = overrideAllowedArea || allowedArea;
+
             setIsVerifying(true);
             setLocationError(null);
 
@@ -75,11 +77,11 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
                         const distance = calculateDistance(
                             latitude,
                             longitude,
-                            allowedArea.lat,
-                            allowedArea.lng
+                            targetArea.lat,
+                            targetArea.lng
                         );
 
-                        const isWithinArea = distance <= allowedArea.radius;
+                        const isWithinArea = distance <= targetArea.radius;
 
                         setIsVerifying(false);
 
@@ -89,8 +91,8 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
                         } else {
                             toast({
                                 title: "Location Not Authorized",
-                                description: `You are ${distance.toFixed(1)}km from the voting area (max: ${allowedArea.radius}km). 
-                [Target: ${allowedArea.lat.toFixed(4)}, ${allowedArea.lng.toFixed(4)}] 
+                                description: `You are ${distance.toFixed(1)}km from the voting area (max: ${targetArea.radius}km). 
+                [Target: ${targetArea.lat.toFixed(4)}, ${targetArea.lng.toFixed(4)}] 
                 [Yours: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}]`,
                                 variant: "destructive",
                             });

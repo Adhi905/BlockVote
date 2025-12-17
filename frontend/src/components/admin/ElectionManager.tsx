@@ -38,6 +38,16 @@ export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps)
   });
   const [candidates, setCandidates] = useState<Candidate[]>([{ name: "", party: "" }, { name: "", party: "" }]);
 
+  // Geofencing state for new election
+  const [geofenceConfig, setGeofenceConfig] = useState({
+    enabled: false,
+    lat: 0,
+    lng: 0,
+    radius: 50,
+    name: "Voting Zone"
+  });
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+
   useEffect(() => {
     loadElections();
   }, []);
@@ -98,6 +108,32 @@ export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps)
     }
   };
 
+  const getCurrentLocation = () => {
+    setIsGettingLocation(true);
+
+    if (!navigator.geolocation) {
+      toast({ title: "Error", description: "Geolocation not supported", variant: "destructive" });
+      setIsGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setGeofenceConfig({
+          ...geofenceConfig,
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setIsGettingLocation(false);
+        toast({ title: "Location Set", description: "Current location has been set." });
+      },
+      (error) => {
+        setIsGettingLocation(false);
+        toast({ title: "Error", description: "Unable to get location", variant: "destructive" });
+      }
+    );
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsCreating(true);
@@ -134,7 +170,8 @@ export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps)
           startTime: formData.startTime,
           endTime: formData.endTime,
           candidates: validCandidates,
-          durationSeconds
+          durationSeconds,
+          geofence: geofenceConfig
         })
       });
 
@@ -143,11 +180,12 @@ export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps)
 
       setFormData({ name: "", description: "", startTime: "", endTime: "" });
       setCandidates([{ name: "", party: "" }, { name: "", party: "" }]);
+      setGeofenceConfig({ enabled: false, lat: 0, lng: 0, radius: 50, name: "Voting Zone" });
       setShowForm(false);
 
       toast({
         title: "Election Created",
-        description: `${formData.name} has been created successfully in MongoDB.`
+        description: `${formData.name} has been created successfully.`
       });
     } catch (error: any) {
       console.error('Error creating election:', error);
@@ -180,24 +218,6 @@ export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps)
           Create Election
         </Button>
       </div>
-
-      {/* Geofencing Shortcut */}
-      {onConfigureGeofencing && (
-        <div className="flex items-center justify-between p-4 rounded-xl bg-accent/10 border border-accent/20">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-accent/20 rounded-lg">
-              <MapPin className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <h4 className="font-bold text-sm">Geofencing Configuration</h4>
-              <p className="text-xs text-muted-foreground">Restrict voting to specific locations.</p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm" onClick={onConfigureGeofencing} className="btn-hover-glow">
-            Configure Geofencing
-          </Button>
-        </div>
-      )}
 
       {/* Create Form */}
       {showForm && (
@@ -247,6 +267,71 @@ export const ElectionManager = ({ onConfigureGeofencing }: ElectionManagerProps)
                   className="h-12 bg-background/50"
                 />
               </div>
+            </div>
+
+            {/* Geofencing Configuration */}
+            <div className="space-y-4 p-4 rounded-xl bg-accent/5 border border-accent/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-accent" />
+                  <h4 className="font-bold">Geofencing</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label className="cursor-pointer">Enable</Label>
+                  <Input
+                    type="checkbox"
+                    className="w-4 h-4"
+                    checked={geofenceConfig.enabled}
+                    onChange={(e) => setGeofenceConfig({ ...geofenceConfig, enabled: e.target.checked })}
+                  />
+                </div>
+              </div>
+
+              {geofenceConfig.enabled && (
+                <div className="grid md:grid-cols-3 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label>Latitude</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={geofenceConfig.lat}
+                      onChange={(e) => setGeofenceConfig({ ...geofenceConfig, lat: parseFloat(e.target.value) || 0 })}
+                      className="bg-background/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Longitude</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={geofenceConfig.lng}
+                      onChange={(e) => setGeofenceConfig({ ...geofenceConfig, lng: parseFloat(e.target.value) || 0 })}
+                      className="bg-background/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Radius (km)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={geofenceConfig.radius}
+                      onChange={(e) => setGeofenceConfig({ ...geofenceConfig, radius: parseFloat(e.target.value) || 1 })}
+                      className="bg-background/50"
+                    />
+                  </div>
+                  <div className="md:col-span-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={getCurrentLocation}
+                      disabled={isGettingLocation}
+                      className="w-full"
+                    >
+                      {isGettingLocation ? "Locating..." : "Use Current Location (Admin)"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
