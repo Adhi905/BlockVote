@@ -4,12 +4,9 @@ import { HeroSection } from "@/components/HeroSection";
 import { VotingSection } from "@/components/VotingSection";
 import { SecuritySection } from "@/components/SecuritySection";
 import { Footer } from "@/components/Footer";
-import { LocationVerification } from "@/components/LocationVerification";
 import { useLocationVerification } from "@/hooks/useLocationVerification";
-import { ethers } from "ethers";
 import { toast } from "@/hooks/use-toast";
 import { web3Service } from "@/services/web3Service";
-import { apiService } from "@/services/apiService";
 
 const Index = () => {
   const [isConnected, setIsConnected] = useState(false);
