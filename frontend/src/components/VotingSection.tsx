@@ -100,27 +100,42 @@ export const VotingSection = ({
     setIsVoting(true);
 
     try {
-      // Step 0: Check Geofence
+      // Step 0: Check Geofence - DEBUG LOGGING
+      console.log("=== GEOFENCE DEBUG ===");
+      console.log("Election:", currentElection?.name);
+      console.log("Geofence config:", JSON.stringify(currentElection?.geofence));
+      console.log("onVerifyLocation function:", !!onVerifyLocation);
+
       if (onVerifyLocation) {
         // Check if this specific election has geofencing enabled
         if (currentElection.geofence && currentElection.geofence.enabled) {
+          console.log("Geofence ENABLED - calling verifyLocation...");
+          toast({
+            title: "Location Check",
+            description: `Checking location for ${currentElection.name}...`,
+          });
           const isVerified = await onVerifyLocation(currentElection.geofence);
+          console.log("Location verification result:", isVerified);
           if (!isVerified) {
+            toast({
+              title: "Location Check Failed",
+              description: "You are not within the authorized voting area.",
+              variant: "destructive",
+            });
             setIsVoting(false);
             return;
           }
+          toast({
+            title: "Location Verified",
+            description: "You are within the authorized voting area.",
+          });
         } else {
-          // If no specific geofence, we might fallback to global or skip
-          // For now, let's assume if it's not enabled on election, it's open
-          // UNLESS the prop requires it. But the prop is just a function.
-          // Let's pass undefined to use default if no election geofence, 
-          // OR skip if we want to allow voting.
-          // Given the requirements "verified by radius", let's assume explicit config.
-          // If election has NO geofence config (old elections), maybe skip check?
-          // Safest: Check if geofence exists.
-
-          console.log("No geofence enabled for this election, skipping check.");
+          console.log("Geofence NOT enabled or missing for this election");
+          console.log("geofence exists:", !!currentElection.geofence);
+          console.log("geofence.enabled:", currentElection.geofence?.enabled);
         }
+      } else {
+        console.log("onVerifyLocation function not provided");
       }
 
       // Step 1: Validate election with backend
