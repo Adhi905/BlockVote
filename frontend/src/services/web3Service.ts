@@ -54,17 +54,40 @@ class Web3Service {
     }
   }
 
+  // Helper to wait for window.ethereum to be injected (common issue in mobile browsers)
+  private async waitForEthereum(timeout = 3000): Promise<any> {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      return window.ethereum;
+    }
+
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        if (window.ethereum) {
+          clearInterval(interval);
+          resolve(window.ethereum);
+        } else if (Date.now() - startTime > timeout) {
+          clearInterval(interval);
+          resolve(null);
+        }
+      }, 100);
+    });
+  }
+
   async connectWallet(): Promise<{ address: string; network: string }> {
-    if (typeof window === 'undefined' || !window.ethereum) {
-      throw new Error('MetaMask not installed or not available');
+    // Wait for injection
+    const ethereum = await this.waitForEthereum();
+
+    if (!ethereum) {
+      throw new Error('Wallet not found. Please verify you are using a Web3-enabled browser (MetaMask, Coinbase Wallet, etc.)');
     }
 
     try {
-      // Initialize BrowserProvider here, as it requires window.ethereum
-      this.provider = new ethers.BrowserProvider(window.ethereum);
+      // Initialize BrowserProvider here
+      this.provider = new ethers.BrowserProvider(ethereum);
 
       // Request account access
-      const accounts = await window.ethereum.request({
+      const accounts = await ethereum.request({
         method: 'eth_requestAccounts'
       });
 
@@ -82,10 +105,12 @@ class Web3Service {
       const network = await this.provider.getNetwork();
 
       // Check if we're on the correct network (Sepolia)
+      // Note: Some mobile wallets might have issues switching programmatically
+      // We'll try, but provide clear error if it fails
       if (Number(network.chainId) !== 11155111) {
         // Try to switch to Sepolia network
         try {
-          await window.ethereum.request({
+          await ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: '0xaa36a7' }], // 11155111 in hex
           });
@@ -100,7 +125,7 @@ class Web3Service {
           // This error code indicates that the chain has not been added to MetaMask
           if (switchError.code === 4902) {
             try {
-              await window.ethereum.request({
+              await ethereum.request({
                 method: 'wallet_addEthereumChain',
                 params: [{
                   chainId: '0xaa36a7',
@@ -123,11 +148,12 @@ class Web3Service {
               };
             } catch (addError) {
               console.error('Failed to add Sepolia network:', addError);
-              throw new Error('Please switch to Sepolia network (Chain ID: 11155111)');
+              throw new Error('Please switch to Sepolia network (Chain ID: 11155111) manually in your wallet.');
             }
           } else {
             console.error('Failed to switch to Sepolia network:', switchError);
             // Even if switching fails, we can still return the current network info
+            // But warns the user
             return {
               address: this.address,
               network: network.name + ' (Please switch to Sepolia)'
@@ -144,6 +170,34 @@ class Web3Service {
       console.error('Error connecting wallet:', error);
       throw new Error(error.message || 'Failed to connect wallet');
     }
+  }
+
+  // Check if wallet is already connected (replaces direct window.ethereum check)
+  async checkConnection(): Promise<{ address: string; network: string } | null> {
+    const ethereum = await this.waitForEthereum(1000); // Shorter timeout for check
+    if (!ethereum) return null;
+
+    try {
+      this.provider = new ethers.BrowserProvider(ethereum);
+      const accounts = await this.provider.listAccounts();
+      if (accounts.length > 0) {
+        this.address = accounts[0].address;
+        this.signer = await this.provider.getSigner();
+        this.contract = new ethers.Contract(
+          deployedVoting.address,
+          votingAbi,
+          this.signer
+        );
+        const network = await this.provider.getNetwork();
+        return {
+          address: this.address,
+          network: network.name
+        };
+      }
+    } catch (e) {
+      console.error("Silent connection check failed:", e);
+    }
+    return null;
   }
 
   async disconnectWallet() {

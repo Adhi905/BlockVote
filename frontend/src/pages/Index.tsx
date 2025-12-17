@@ -24,20 +24,17 @@ const Index = () => {
   }, []);
 
   const checkWalletConnection = async () => {
-    // Check if window.ethereum exists and has accounts
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.listAccounts();
-        const connected = accounts.length > 0;
-        setIsConnected(connected);
-        if (connected) {
-          setWalletAddress(accounts[0].address);
-        }
-      } catch (error) {
-        console.error("Error checking wallet connection:", error);
-        setIsConnected(false);
-      }
+    // Robust check using web3Service helper that handles mobile timing
+    const connection = await web3Service.checkConnection();
+    if (connection) {
+      setIsConnected(true);
+      setWalletAddress(connection.address);
+      toast({
+        title: "Wallet Connected",
+        description: `Restored connection: ${connection.address.slice(0, 6)}...`
+      });
+    } else {
+      setIsConnected(false);
     }
   };
 
