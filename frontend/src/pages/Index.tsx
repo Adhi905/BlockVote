@@ -41,6 +41,11 @@ const Index = () => {
         }
       } catch (error) {
         console.error("Failed to fetch geofence config:", error);
+        toast({
+          title: "Configuration Error",
+          description: "Failed to load geofencing settings. Using default restrictions.",
+          variant: "destructive"
+        });
         // On error, default to requiring location verification for security
         setGeofenceConfig({
           enabled: true,

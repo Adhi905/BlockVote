@@ -89,7 +89,9 @@ export const useLocationVerification = (allowedArea: AllowedArea = DEFAULT_ALLOW
                         } else {
                             toast({
                                 title: "Location Not Authorized",
-                                description: `You are ${distance.toFixed(1)}km from the voting area (max: ${allowedArea.radius}km).`,
+                                description: `You are ${distance.toFixed(1)}km from the voting area (max: ${allowedArea.radius}km). 
+                [Target: ${allowedArea.lat.toFixed(4)}, ${allowedArea.lng.toFixed(4)}] 
+                [Yours: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}]`,
                                 variant: "destructive",
                             });
                         }
